@@ -1,5 +1,6 @@
 # 큐 구현  
 ## 배열로 구현
+[네이버](https:www.naver.com)
 ```
 public struct Queue<T>{
     private var data = [T]()
