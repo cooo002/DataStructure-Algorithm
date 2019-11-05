@@ -1,3 +1,6 @@
+# 큐 구현  
+
+```
 public struct Queue<T>{
     private var data = [T]()
     
@@ -47,6 +50,7 @@ public struct Queue<T>{
         return data.isEmpty
     }
 }
+```
     
 
 var queueEx = Queue<Int>()
