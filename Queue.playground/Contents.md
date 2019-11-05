@@ -1,5 +1,5 @@
 # 큐 구현  
-
+## 배열로 구현
 ```
 public struct Queue<T>{
     private var data = [T]()
@@ -50,9 +50,6 @@ public struct Queue<T>{
         return data.isEmpty
     }
 }
-```
-    
-
 var queueEx = Queue<Int>()
 
 queueEx.enqueue(element: 10)
@@ -63,6 +60,4 @@ queueEx.enqueue(element: 6)
 queueEx.peek()
 
 
-
-
-
+```
