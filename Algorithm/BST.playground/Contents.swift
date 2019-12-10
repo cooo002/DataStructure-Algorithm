@@ -111,8 +111,20 @@ public class BinayTreeNode<T: Comparable>{
             return right.search(value: value)
         }
     }
+    
+//note: BST에서 삭제 관련 로직(BST에서 가장 복잡한 로직이다!)
+//1. 삭제할 도드에 자식이 엇으면 그냥 삭제한다.
+//2. 삭제할 노드에 자식이 하나면 노드를 삭제하고 자식을 삭제된 노드가 있던 위치에 넣는다.
+//3. 자식이 둘인 노드를 삭제할 때는 삭제된 노드를 후속자 노드로 대체한다. (여기서 후속자 노드란 삭제된 노드보다 큰 갓 중 최솟값을
+//    의미한다.)
+// -  만약 후속자 노드에 오른쪽 자식이 있는 경우 후속자를 삭제된 노드가 있던 자리로 넣어주고 후속자 노드의 오른쪽 자식을 후속자 노드의 원래
+//      부모노드의 왼쪽 자식 노드로 넣어준다!
 
     public func delete(){
+        // Todo: 특정노드를 검색해서 삭제하는 것이 아니고 일단 해당 트리를 가르키는 객체에 루트 노드를 삭제하는 로직이다
+// ex)  tree.leftChild.delete()  : 이렇게 삭제를 해줘야한다는 소리이다! 그러면 생기는 단점은 원하는 노드를 삭제할 때
+//                                  일일히 내려가야한다는 단점이 있다!
+        
         // todo:루트노드와 직접적으로 연결된 노드만 삭제하느 로직이다!!
         // 검색을 통해 특정 값을 삭제하는 로직을 만들고싶다면 내가 해당 로직을 수행하는
         // 메소드를 직접 만들어주자!
@@ -140,11 +152,16 @@ public class BinayTreeNode<T: Comparable>{
     }
 
     private func exchangeWithSuccerssor(){
+//      Todo: 후속자와 삭제하려는 노드를 교환하는 로직이 실행되는 메소드이다!
+//       note: 자식 노드가 2개인 노드를 삭제할 때 실행되는 메소드이다.
         guard let right = self.rightChild, let left = self.leftChild else {
                 return
         }
         let succerssor = right.minimum()
+        //여기서 후속자노드를 설정한다.(삭제노드 보다 큰 값중에 가장 큰 값을 설정하는 부분이다!)
         succerssor.delete()
+//       도대체 여기서 왜 후속노드를 삭제하는가??
+        
 
         succerssor.leftChild = left
         left.parent = succerssor
@@ -172,7 +189,74 @@ public class BinayTreeNode<T: Comparable>{
             child?.parent = parent
         }
     }
-
+    public func minime() -> BinayTreeNode{
+//        note: 가장 작은 노드를 반환한다.(정렬이 되어있다면 분명히 왼쪽 노드로 쭉 내려가면 가장 작은 값이 존재!)
+        if let left = leftChild{
+//         note: 노드외 왼쪽 자식노드가 있다면 해당 노드보다 더 작은 노드가 존재한다는 소리와 같다!
+            return left.minimum()
+        }else{
+//          note: 왼쪽 자식 노드가 없다면 결국 해당 노드가 가장 작은 값이라는 소리이다!
+            return self
+        }
+    }
+        
+    public func minimumValue() -> T{
+        //note: 현재 트리 내에서 가장 작은 값을 반환한다.
+        if let left = leftChild{
+            return left.minimumValue()
+        }else{
+            return value
+        }
+    }
+    
+    public func maximumValue() -> T{
+//        note: 트리 내에서 가장 큰 값을 반환한다.
+        if let right = rightChild{
+            return right.maximumValue()
+        }else{
+            return value
+        }
+    }
+    
+  
+    public func maximum() -> BinayTreeNode{
+//        note: 가장 큰 노드를 반환하다.(정렬이 되어있다면 오른쪽으로 쭉 내려가면 가장 큰 값이 존재한다! )
+        if let right = rightChild{
+//         note: 노드외 왼쪽 자식노드가 있다면 해당 노드보다 더 작은 노드가 존재한다는 소리와 같다!
+            return right.maximum()
+        }else{
+//          note: 왼쪽 자식 노드가 없다면 결국 해당 노드가 가장 작은 값이라는 소리이다!
+            return self
+        }
+    }
+    
+    public func height() -> Int{
+//        note: 높이는 루트 노드에서 잰 높이를 의미한다.
+        if leftChild == nil && rightChild == nil{
+            return 0
+        }
+        return 1 + max(leftChild?.height() ?? 0, rightChild?.height() ?? 0)
+//        note: max() 는 매개변수로 들어가는 두 값을 비교하여 더 큰 값을 반환한다.
+    }
+    
+    public func depth() -> Int{
+//       note: 깊이는 루트와 노드를 연결한 모서리의 수를 의미한다.(근데 depth와 heigh는 같을 수 밖에 없지 않나??)
+//       -> 근데 생각을 해보면 깊이는 어떤 노드의 깊이를 구하는냐에 따라 다르다 그래서 아래와 같이 코드를 구성하여 특정 노드부터 위로
+//        올라가면서 로직을 구성해야한다.! 그렇게 거꾸로 거슬러 올라가다가 더이상 부모 노드가 없다면 루트노드를 만났다는 소리이다. 그러면
+//        로직을 멈추고 그때까지의 deapth를 반환하면 된다!
+        guard var node = parent else {
+            return 0
+        }
+        var depth = 1
+        while let parent = node.parent {
+            depth = depth + 1
+            node = parent
+        }
+        return depth
+    }
+    
+    
+    
     public func minimum() -> BinayTreeNode{
         if let left = leftChild{
             return left.minimum()
@@ -204,6 +288,11 @@ node.leftChild?.delete()
 print(result?.value)
 
 BinayTreeNode.traverseInOrder(node:node)
+BinayTreeNode.traversePreOrder(node: node)
+print("현재 트리에서 가장 큰 값? :\(node.maximum().value)")
+print("현재 트리에서 가장 작은 값? : \(node.minimum().value)")
+
+
 
 
 
